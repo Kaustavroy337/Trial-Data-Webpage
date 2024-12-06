@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Google Sheet Data</title>
+  <style>
+    /* Add some styling for the data table */
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f4f4f4;
+    }
+  </style>
+</head>
+<body>
+  <h1>Google Sheet Data</h1>
+  <table id="data-table">
+    <!-- Table headers and data will be inserted dynamically -->
+  </table>
+
+  <!-- Include a script to fetch and display the data -->
+  <script>
+    // The URL of your Google Apps Script (replace with your actual URL)
+    const apiUrl = "https://script.google.com/macros/s/AKfycbyQ93aOL3VjWG7mN9PjGkbaIx4Aebq3nFcDNIBNb1tazmyrsnP9ODBeMOXhpzuNcraV3w/exec";
+
+    // Fetch data from the API
+    fetch(apiUrl)
+      .then(response => response.json()) // Parse the JSON data
+      .then(data => {
+        // Display the data on the webpage
+        displayData(data);
+      })
+      .catch(error => console.error("Error fetching data:", error));
+
+    // Function to display data in the table
+    function displayData(data) {
+      const table = document.getElementById("data-table");
+
+      // Create the table headers dynamically
+      if (data.length > 0) {
+        const headers = Object.keys(data[0]);
+        let headerRow = "<tr>";
+        headers.forEach(header => {
+          headerRow += `<th>${header}</th>`;
+        });
+        headerRow += "</tr>";
+        table.innerHTML += headerRow;
+      }
+
+      // Add the rows of data
+      data.forEach(row => {
+        let dataRow = "<tr>";
+        for (let key in row) {
+          dataRow += `<td>${row[key]}</td>`;
+        }
+        dataRow += "</tr>";
+        table.innerHTML += dataRow;
+      });
+    }
+    setInterval(() => {
+  fetch(apiUrl)
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById("data-table").innerHTML = ""; // Clear old data
+      displayData(data); // Reload new data
+    });
+}, 5000); // Fetch data every 5 seconds
+
+  </script>
+</body>
+</html>
